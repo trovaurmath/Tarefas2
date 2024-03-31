@@ -1,0 +1,34 @@
+# Define o AFND para cadeias que terminam com 1
+class AFND:
+    def __init__(self):
+        # Estados: q0 (inicial), q1 (aceitação), q2 (transitório)
+        self.estados = {'q0', 'q1', 'q2'}
+        self.estado_inicial = 'q0'
+        self.estados_aceitacao = {'q1'}
+        # Função de transição: (estado_atual, entrada) -> conjunto de estados seguintes
+        self.transicoes = {
+            ('q0', '0'): {'q2'},
+            ('q0', '1'): {'q1'},
+            ('q1', '0'): {'q2'},
+            ('q1', '1'): {'q1'},
+            ('q2', '0'): {'q2'},
+            ('q2', '1'): {'q1'},
+        }
+        
+    def aceita(self, cadeia):
+        estados_atuais = {self.estado_inicial}
+        for simbolo in cadeia:
+            proximos_estados = set()
+            for estado in estados_atuais:
+                proximos_estados |= self.transicoes.get((estado, simbolo), set())
+            estados_atuais = proximos_estados
+            if not estados_atuais:
+                return False
+        return not estados_atuais.isdisjoint(self.estados_aceitacao)
+
+# Testando o AFND
+afnd = AFND()
+cadeias_teste = ['1', '011', '0010', '101', '1101', '100']
+for cadeia in cadeias_teste:
+    resultado = afnd.aceita(cadeia)
+    print(f"Cadeia '{cadeia}' é {'aceita' if resultado else 'rejeitada'} pelo AFND.")
