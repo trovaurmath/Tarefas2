@@ -1,0 +1,32 @@
+class AFND:
+    def __init__(self):
+        self.estados = {'q_start', 'q_0', 'q_1'}
+        self.estado_inicial = 'q_start'
+        self.estados_aceitacao = {'q_0', 'q_1'}
+        # Transições: estado_atual + entrada -> conjunto de estados possíveis
+        self.transicoes = {
+            ('q_start', '0'): {'q_0'},
+            ('q_start', '1'): {'q_1'},
+            ('q_0', '0'): {'q_0'},
+            ('q_0', '1'): {'q_0', 'q_1'}, # Não determinístico: permite transição para q_1 caso a cadeia mude para '1'
+            ('q_1', '1'): {'q_1'},
+            ('q_1', '0'): {'q_0', 'q_1'}, # Não determinístico: permite transição para q_0 caso a cadeia mude para '0'
+        }
+
+    def aceita(self, cadeia):
+        def verificar(cadeia, estado_atual):
+            if not cadeia:
+                return estado_atual in self.estados_aceitacao
+            simbolo_atual = cadeia[0]
+            restante_cadeia = cadeia[1:]
+            proximos_estados = self.transicoes.get((estado_atual, simbolo_atual), set())
+            return any(verificar(restante_cadeia, prox_estado) for prox_estado in proximos_estados)
+
+        return verificar(cadeia, self.estado_inicial)
+
+# Testando o AFND
+afnd = AFND()
+cadeias_teste = ['0', '11', '010', '101', '11011', '001100', '1001']
+for cadeia in cadeias_teste:
+    resultado = afnd.aceita(cadeia)
+    print(f"Cadeia '{cadeia}' é {'aceita' if resultado else 'rejeitada'} pelo AFND.")
