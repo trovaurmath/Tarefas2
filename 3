@@ -1,0 +1,27 @@
+# Define o AFND para cadeias com número par de 0's
+class AFND:
+    def __init__(self):
+        # Estados: q_par (par de 0's), q_impar (ímpar de 0's)
+        self.estados = {'q_par', 'q_impar'}
+        self.estado_inicial = 'q_par'
+        self.estados_aceitacao = {'q_par'}
+        # Função de transição: (estado_atual, entrada) -> conjunto de estados seguintes
+        self.transicoes = {
+            ('q_par', '0'): {'q_impar'},
+            ('q_par', '1'): {'q_par'},
+            ('q_impar', '0'): {'q_par'},
+            ('q_impar', '1'): {'q_impar'},
+        }
+        
+    def aceita(self, cadeia):
+        estado_atual = self.estado_inicial
+        for simbolo in cadeia:
+            estado_atual = next(iter(self.transicoes.get((estado_atual, simbolo), {estado_atual}))) # Assume transição determinística
+        return estado_atual in self.estados_aceitacao
+
+# Testando o AFND
+afnd = AFND()
+cadeias_teste = ['0', '00', '010', '1010', '11011', '001100']
+for cadeia in cadeias_teste:
+    resultado = afnd.aceita(cadeia)
+    print(f"Cadeia '{cadeia}' é {'aceita' if resultado else 'rejeitada'} pelo AFND.")
